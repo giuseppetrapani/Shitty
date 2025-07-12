@@ -126,7 +126,7 @@ def main():
         fg="#ffffff",  # testo bianco
         padx=5, pady=5, #padding
         font=font_cascadia, #font
-        insertbackground="#000000",  # cursore nero
+        insertbackground="#ffffff",  # cursore nero
         wrap="word"  # va a capo automaticamente
     )
     text_area.pack(expand=True, fill="both")
