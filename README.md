@@ -16,16 +16,16 @@ python src/main.py
 Esempi dei temi disponibili:
 
 ### Tema Scuro
-<img src="Screenshot%202025-07-12%20165124.png" alt="Tema Scuro" width="500" />
+<img src="screenshot_temascuro.png" alt="Tema Scuro" width="500" />
 
 ### Tema Gruvbox
-<img src="Screenshot%202025-07-12%20165124.png" alt="Tema Gruvbox" width="500" />
+<img src="screenshot_gruvbox.png" alt="Tema Gruvbox" width="500" />
 
 ### Tema Shades of Purple
-<img src="Screenshot%202025-07-12%20165124.png" alt="Tema Shades of Purple" width="500" />
+<img src="screenshot_shadeofpurple.png" alt="Tema Shades of Purple" width="500" />
 
 ### Tema Chiaro
-<img src="Screenshot%202025-07-12%20165124.png" alt="Tema Chiaro" width="500" />
+<img src="screenshot_temachiaro.png" alt="Tema Chiaro" width="500" />
 
 ---
 
