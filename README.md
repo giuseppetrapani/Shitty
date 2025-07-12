@@ -20,6 +20,3 @@ Questo progetto è solo a scopo di prova e sperimentazione.
 - Comando `ls` (mostra i file)
 - Comando `random "min - max"` (numero casuale)
 
----
-
-Made with ❤️ for test only.
