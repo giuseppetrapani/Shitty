@@ -2,6 +2,8 @@
 
 Un semplice terminale grafico in Tkinter per Windows.
 
+![](./screenshot.png)
+
 ## Esempio di utilizzo
 
 ```
