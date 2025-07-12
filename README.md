@@ -6,7 +6,28 @@ Un semplice terminale grafico in Tkinter per Windows.
 
 ```
 python src/main.py
+
 ```
+
+---
+
+## Screenshot dei temi
+
+Esempi dei temi disponibili:
+
+### Tema Scuro
+<img src="Screenshot%202025-07-12%20165124.png" alt="Tema Scuro" width="500" />
+
+### Tema Gruvbox
+<img src="Screenshot%202025-07-12%20165124.png" alt="Tema Gruvbox" width="500" />
+
+### Tema Shades of Purple
+<img src="Screenshot%202025-07-12%20165124.png" alt="Tema Shades of Purple" width="500" />
+
+### Tema Chiaro
+<img src="Screenshot%202025-07-12%20165124.png" alt="Tema Chiaro" width="500" />
+
+---
 
 ## Attenzione
 
@@ -14,7 +35,9 @@ Questo progetto è solo a scopo di prova e sperimentazione.
 **Non utilizzare come terminale principale!**
 
 
+
 ## Funzionalità
+
 - Prompt personalizzato con percorso corrente (`os.getcwd()`)
 - Esecuzione di comandi di shell (Windows)
 - Comando `cls`/`clear` per pulire il terminale
@@ -30,23 +53,4 @@ Questo progetto è solo a scopo di prova e sperimentazione.
 - Tutto il codice è facilmente estendibile e commentato
 
 
----
 
-## Screenshot dei temi
-
-Temi disponibili:
-
-### Tema Scuro
-<img src="Screenshot%202025-07-12%20165124.png" alt="Tema Scuro" width="500" />
-
-### Tema Gruvbox
-<img src="Screenshot%202025-07-12%20165124.png" alt="Tema Gruvbox" width="500" />
-
-### Tema Shades of Purple
-<img src="Screenshot%202025-07-12%20165124.png" alt="Tema Shades of Purple" width="500" />
-
-### Tema Chiaro
-<img src="Screenshot%202025-07-12%20165124.png" alt="Tema Chiaro" width="500" />
-
-
----
