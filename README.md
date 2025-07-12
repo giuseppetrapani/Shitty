@@ -22,9 +22,4 @@ Questo progetto è solo a scopo di prova e sperimentazione.
 - Comando `ls` (mostra i file)
 - Comando `random "min - max"` (numero casuale)
 
-<<<<<<< HEAD
----
 
-Made with ❤️ for test only.
-=======
->>>>>>> a5065f927cd969d6cc0da83466d91b7994f2a6ac
