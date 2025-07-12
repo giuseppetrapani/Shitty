@@ -1,4 +1,3 @@
-
 """
 Shitty Terminal - Un semplice terminale grafico in Tkinter
 
@@ -17,11 +16,20 @@ Note:
 # 'end-1c' -> indice alla fine del contenuto di text meno un carattere (cioè subito prima della fine)
 # <Return> -> evento tasto Invio
 
+
 import tkinter as tk
 import os
 import subprocess
 import tkinter.font as tkfont
 import random
+
+# --- Fix per problemi di sgranatura su Windows (DPI awareness) ---
+# Questo codice forza la modalità DPI-aware per evitare che la GUI appaia sfocata su schermi ad alta risoluzione.
+import ctypes
+try:
+    ctypes.windll.shcore.SetProcessDpiAwareness(1)
+except Exception:
+    pass
 
 
 def command(comando: str):
@@ -109,40 +117,156 @@ def on_enter(event):
 
 
 def main():
+
     # Crea la finestra principale
     root = tk.Tk()
     root.title('Shitty')
     root.geometry("1000x600")  # Dimensioni della finestra
 
     # Font monospaziato per simulare un terminale vero
-    font_cascadia = tkfont.Font(family="Cascadia Mono", size=11)
+    font_cascadia = tkfont.Font(family="Cascadia Mono", size=11, weight="normal")
 
+    # --- BARRA PERSONALIZZATA ---
+    barra = tk.Frame(root, height=14, bg="#181818")
+    barra.pack(side="top", fill="x")
+
+    # =====================
+    # 1. FUNZIONI TEMA
+    # =====================
+    def set_tema_chiaro():
+        text_area.config(bg="#f5f5f5", fg="#222222", insertbackground="#222222")
+        barra.config(bg="#f5f5f5")
+        luna.config(bg="#f5f5f5", fg="#222222", activebackground="#e0e0e0", activeforeground="#222222")
+        menu_temi.config(bg="#f5f5f5", fg="#222222", activebackground="#e0e0e0", activeforeground="#222222")
+        menu_impostazioni.config(bg="#f5f5f5", fg="#222222", activebackground="#e0e0e0", activeforeground="#222222")
+        aggiorna_menu_font()
+
+    def set_tema_scuro():
+        text_area.config(bg="#181818", fg="#ffffff", insertbackground="#ffffff")
+        barra.config(bg="#181818")
+        luna.config(bg="#181818", fg="#ffffff", activebackground="#222222", activeforeground="#ffffff")
+        menu_temi.config(bg="#181818", fg="#ffffff", activebackground="#222222", activeforeground="#ffffff")
+        menu_impostazioni.config(bg="#181818", fg="#ffffff", activebackground="#222222", activeforeground="#ffffff")
+        aggiorna_menu_font()
+
+    def set_tema_gruvbox():
+        text_area.config(bg="#282828", fg="#ebdbb2", insertbackground="#ebdbb2")
+        barra.config(bg="#282828")
+        luna.config(bg="#282828", fg="#ebdbb2", activebackground="#3c3836", activeforeground="#ebdbb2")
+        menu_temi.config(bg="#282828", fg="#ebdbb2", activebackground="#3c3836", activeforeground="#ebdbb2")
+        menu_impostazioni.config(bg="#282828", fg="#ebdbb2", activebackground="#3c3836", activeforeground="#ebdbb2")
+        aggiorna_menu_font()
+
+    def set_tema_shades_of_purple():
+        text_area.config(bg="#2d2b55", fg="#fad000", insertbackground="#fad000")
+        barra.config(bg="#2d2b55")
+        luna.config(bg="#2d2b55", fg="#fad000", activebackground="#5e4b8b", activeforeground="#fad000")
+        menu_temi.config(bg="#2d2b55", fg="#fad000", activebackground="#5e4b8b", activeforeground="#fad000")
+        menu_impostazioni.config(bg="#2d2b55", fg="#fad000", activebackground="#5e4b8b", activeforeground="#fad000")
+        aggiorna_menu_font()
+
+    # =====================
+    # 2. FUNZIONI FONT
+    # =====================
+    def set_font_size(size):
+        font_cascadia.configure(size=size)
+        aggiorna_menu_font()
+
+    def aggiorna_menu_font():
+        # Aggiorna i colori del menu_font e dei sottomenu in base al tema
+        # Aggiorna i colori della tendina e delle voci
+        menu_font.config(
+            bg=menu_temi.cget('bg'),
+            fg=menu_temi.cget('fg'),
+            activebackground=menu_temi.cget('activebackground'),
+            activeforeground=menu_temi.cget('activeforeground'),
+            bd=0,
+            relief="flat"
+        )
+        end_index = menu_font.index('end')
+        if end_index is not None:
+            for i in range(end_index+1):
+                # Aggiorna anche la label per la dimensione attuale
+                label = menu_font.entrycget(i, 'label')
+                size = int(label.split()[0]) if label.split()[0].isdigit() else None
+                new_label = f"{size} pt" + ("  (attuale)" if size == font_cascadia['size'] else "") if size else label
+                menu_font.entryconfig(i,
+                    label=new_label,
+                    background=menu_temi.cget('bg'),
+                    foreground=menu_temi.cget('fg'),
+                    activebackground=menu_temi.cget('activebackground'),
+                    activeforeground=menu_temi.cget('activeforeground')
+                )
+
+
+    # =====================
+    # 3. MENU TEMI E IMPOSTAZIONI
+    # =====================
+    # Inizializzazione dei menu e applicazione del tema di default
+    # Questo garantisce che tutti i menu (inclusa la tendina del font) siano già adattati al tema all'avvio
+    menu_temi = tk.Menu(barra, tearoff=0)
+    menu_temi.add_command(label="Chiaro", command=set_tema_chiaro)
+    menu_temi.add_command(label="Scuro", command=set_tema_scuro)
+    menu_temi.add_command(label="Gruvbox", command=set_tema_gruvbox)
+    menu_temi.add_command(label="Shades of Purple", command=set_tema_shades_of_purple)
+
+    menu_impostazioni = tk.Menu(barra, tearoff=0)
+    menu_font = tk.Menu(menu_impostazioni, tearoff=0)
+    for size in range(8, 25, 2):
+        menu_font.add_command(label=f"{size} pt" + ("  (attuale)" if font_cascadia['size']==size else ""), command=lambda s=size: set_font_size(s))
+    menu_impostazioni.add_cascade(label="Grandezza font", menu=menu_font)
+
+
+    # =====================
+    # 5. TEXT AREA TERMINALE
+    # =====================
     global input_start_index, text_area
-    # Crea l'area di testo principale (il "terminale")
-    # Colori blu notte e testo azzurro chiaro
     text_area = tk.Text(
         root,
-        bg="#181818", # nero meno intenso (grigio molto scuro)
-        fg="#ffffff",  # testo bianco
-        padx=5, pady=5, #padding
-        font=font_cascadia, #font
-        insertbackground="#ffffff",  # cursore nero
-        wrap="word"  # va a capo automaticamente
+        bg="#181818",
+        fg="#ffffff",
+        padx=5, pady=5,
+        font=font_cascadia,
+        insertbackground="#ffffff",
+        wrap="word"
     )
     text_area.pack(expand=True, fill="both")
 
-    # Inserisci il primo prompt con percorso corrente
+    # =====================
+    # 4. BOTTONI BARRA
+    # =====================
+    def mostra_menu_temi(event=None):
+        x = luna.winfo_rootx()
+        y = luna.winfo_rooty() + luna.winfo_height()
+        menu_temi.tk_popup(x, y)
+
+    def mostra_menu_impostazioni(event=None):
+        x = impostazioni.winfo_rootx()
+        y = impostazioni.winfo_rooty() + impostazioni.winfo_height()
+        menu_impostazioni.tk_popup(x, y)
+        # Rimuove l'hover dal bottone quando il menu viene chiuso
+        menu_impostazioni.grab_release()
+        impostazioni.config(state="normal")
+
+    luna = tk.Button(barra, text="🌙", bg="#181818", fg="#ffffff", bd=0, font=("Segoe UI Emoji", 14), activebackground="#222222", activeforeground="#ffffff", command=mostra_menu_temi, cursor="hand2")
+    luna.pack(side="right", padx=8, pady=2)
+
+    impostazioni = tk.Button(barra, text="⚙️", bg="#181818", fg="#ffffff", bd=0, font=("Segoe UI Emoji", 14), activebackground="#222222", activeforeground="#ffffff", command=mostra_menu_impostazioni, cursor="hand2")
+    impostazioni.pack(side="left", padx=8, pady=2)
+
+    # Applica il tema scuro di default (così tutti i menu sono già adattati)
+    set_tema_scuro()
+
+    # =====================
+    # 6. PROMPT E EVENTI
+    # =====================
     prompt = f"{os.getcwd()} -> "
     text_area.insert("end", prompt)
     input_start_index = text_area.index("end-1c")
-
-    # Focus subito pronto per scrivere
     text_area.focus_set()
     text_area.mark_set("insert", "end")
-
-    # Collega gli eventi principali
-    text_area.bind("<Return>", on_enter)  # Invio esegue il comando
-    text_area.bind("<Key>", on_key_press) # Protegge il prompt
+    text_area.bind("<Return>", on_enter)
+    text_area.bind("<Key>", on_key_press)
 
     root.mainloop()
 
