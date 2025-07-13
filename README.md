@@ -51,6 +51,7 @@ Questo progetto è solo a scopo di prova e sperimentazione.
 - Prompt sempre protetto: puoi scrivere solo dopo il prompt
 - Output dei comandi subito dopo il prompt
 - Tutto il codice è facilmente estendibile e commentato
+- Il config.json tiene traccia della tua ultima config (tema, grandezza_font)
 
 
 
