@@ -22,6 +22,7 @@ import os
 import subprocess
 import tkinter.font as tkfont
 import random
+from ctypes import windll, byref, sizeof, c_int
 
 # --- Fix per problemi di sgranatura su Windows (DPI awareness) ---
 # Questo codice forza la modalità DPI-aware per evitare che la GUI appaia sfocata su schermi ad alta risoluzione.
@@ -66,7 +67,20 @@ def command(comando: str):
             return str(numero_random)
         else:
             return 'Uso: random "min - max"'
-    
+
+    if comando.strip().startswith("touch"):
+        if args := comando.replace('touch', '').strip() == "":
+            return "Uso: touch <nome_file>\nCrea un file vuoto con il nome specificato."
+        else:
+            args = comando.replace('touch', '').strip()
+            if os.path.exists(args):
+                return f"File '{args}' già esistente."
+            try:
+                with open(args, 'a'):
+                    return f"File '{args}' creato."
+            except Exception as e: 
+                return f"Errore nella creazione del file '{args}': {str(e)}"
+            
 
     # Esegui il comando di shell normalmente
     output = subprocess.run(comando, shell=True, capture_output=True, text=True)
@@ -114,56 +128,95 @@ def on_enter(event):
     text_area.mark_set("insert", "end")  # Cursore alla fine
     return "break"
 
-
+def carica_config():
+    try:
+        with open("config.json", "r") as f:
+            import json
+            config = json.load(f)
+        tema = config.get("tema", "scuro")
+        font_size = config.get("font_size", 11)
+        return tema, font_size
+    except FileNotFoundError:
+        return "scuro", 11
 
 def main():
+
+    # Carica la configurazione
+    tema_config, font_size_config = carica_config()
 
     # Crea la finestra principale
     root = tk.Tk()
     root.title('Shitty')
     root.geometry("1000x600")  # Dimensioni della finestra
-
-    # Font monospaziato per simulare un terminale vero
-    font_cascadia = tkfont.Font(family="Cascadia Mono", size=11, weight="normal")
+ 
+    # Font monospaziato per simulare un terminale vero, con la dimensione dalla config
+    global font_cascadia
+    font_cascadia = tkfont.Font(family="Cascadia Mono", size=font_size_config, weight="normal")
 
     # --- BARRA PERSONALIZZATA ---
-    barra = tk.Frame(root, height=14, bg="#181818")
+    barra = tk.Frame(root, height=12, bg="#181818")
     barra.pack(side="top", fill="x")
 
     # =====================
     # 1. FUNZIONI TEMA
     # =====================
     def set_tema_chiaro():
+        global tema_attuale
+        tema_attuale = "chiaro"
         text_area.config(bg="#f5f5f5", fg="#222222", insertbackground="#222222")
         barra.config(bg="#f5f5f5")
         luna.config(bg="#f5f5f5", fg="#222222", activebackground="#e0e0e0", activeforeground="#222222")
         menu_temi.config(bg="#f5f5f5", fg="#222222", activebackground="#e0e0e0", activeforeground="#222222")
         menu_impostazioni.config(bg="#f5f5f5", fg="#222222", activebackground="#e0e0e0", activeforeground="#222222")
+        impostazioni.config(bg="#f5f5f5", fg="#222222", activebackground="#e0e0e0", activeforeground="#222222")
         aggiorna_menu_font()
+        salva_config()
 
     def set_tema_scuro():
+        global tema_attuale
+        tema_attuale = "scuro"
         text_area.config(bg="#181818", fg="#ffffff", insertbackground="#ffffff")
         barra.config(bg="#181818")
         luna.config(bg="#181818", fg="#ffffff", activebackground="#222222", activeforeground="#ffffff")
         menu_temi.config(bg="#181818", fg="#ffffff", activebackground="#222222", activeforeground="#ffffff")
         menu_impostazioni.config(bg="#181818", fg="#ffffff", activebackground="#222222", activeforeground="#ffffff")
+        impostazioni.config(bg="#181818", fg="#ffffff", activebackground="#222222", activeforeground="#ffffff")
         aggiorna_menu_font()
+        salva_config()
 
     def set_tema_gruvbox():
+        global tema_attuale
+        tema_attuale = "gruvbox"
         text_area.config(bg="#282828", fg="#ebdbb2", insertbackground="#ebdbb2")
         barra.config(bg="#282828")
         luna.config(bg="#282828", fg="#ebdbb2", activebackground="#3c3836", activeforeground="#ebdbb2")
         menu_temi.config(bg="#282828", fg="#ebdbb2", activebackground="#3c3836", activeforeground="#ebdbb2")
         menu_impostazioni.config(bg="#282828", fg="#ebdbb2", activebackground="#3c3836", activeforeground="#ebdbb2")
+        impostazioni.config(bg="#282828", fg="#ebdbb2", activebackground="#3c3836", activeforeground="#ebdbb2")
         aggiorna_menu_font()
+        salva_config()
 
     def set_tema_shades_of_purple():
+        global tema_attuale
+        tema_attuale = "shades_of_purple"
         text_area.config(bg="#2d2b55", fg="#fad000", insertbackground="#fad000")
         barra.config(bg="#2d2b55")
         luna.config(bg="#2d2b55", fg="#fad000", activebackground="#5e4b8b", activeforeground="#fad000")
         menu_temi.config(bg="#2d2b55", fg="#fad000", activebackground="#5e4b8b", activeforeground="#fad000")
         menu_impostazioni.config(bg="#2d2b55", fg="#fad000", activebackground="#5e4b8b", activeforeground="#fad000")
+        impostazioni.config(bg="#2d2b55", fg="#fad000", activebackground="#5e4b8b", activeforeground="#fad000")
         aggiorna_menu_font()
+        salva_config()
+
+    # Salva la configurazione corrente in un file JSON
+    def salva_config():
+        config: dict = {
+            "tema": tema_attuale,
+            "font_size": font_cascadia["size"]
+        }
+        with open("config.json", "w") as f:
+            import json
+            json.dump(config, f, indent=4)
 
     # =====================
     # 2. FUNZIONI FONT
@@ -171,6 +224,7 @@ def main():
     def set_font_size(size):
         font_cascadia.configure(size=size)
         aggiorna_menu_font()
+        salva_config()
 
     def aggiorna_menu_font():
         # Aggiorna i colori del menu_font e dei sottomenu in base al tema
@@ -253,9 +307,8 @@ def main():
 
     impostazioni = tk.Button(barra, text="⚙️", bg="#181818", fg="#ffffff", bd=0, font=("Segoe UI Emoji", 14), activebackground="#222222", activeforeground="#ffffff", command=mostra_menu_impostazioni, cursor="hand2")
     impostazioni.pack(side="left", padx=8, pady=2)
-
-    # Applica il tema scuro di default (così tutti i menu sono già adattati)
-    set_tema_scuro()
+ 
+    
 
     # =====================
     # 6. PROMPT E EVENTI
@@ -267,6 +320,15 @@ def main():
     text_area.mark_set("insert", "end")
     text_area.bind("<Return>", on_enter)
     text_area.bind("<Key>", on_key_press)
+    
+
+    # Applica il tema dopo la creazione di tutti i widget
+    global tema_attuale
+    tema_attuale = tema_config
+    if tema_attuale == "scuro": set_tema_scuro()
+    if tema_attuale == "chiaro": set_tema_chiaro()
+    if tema_attuale == "gruvbox": set_tema_gruvbox()
+    if tema_attuale == "shades_of_purple": set_tema_shades_of_purple()
 
     root.mainloop()
 
